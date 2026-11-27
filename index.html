@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es" data-tema="claro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Controla tus gastos diarios, genera reportes y crea un plan personalizado para alcanzar tu meta de ahorro.">
+  <meta name="theme-color" content="#2563eb">
+  <title>CGI — Asistente de Control de Gastos y Ahorro</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💰</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ══ ENCABEZADO ══════════════════════════════════════════════ -->
+<header>
+  <div class="header-inner">
+    <div class="header-brand">
+      <span class="brand-icon">💰</span>
+      <div>
+        <h1>CGI — Control de Gastos Inteligente</h1>
+        <p>Ahora puedes registrar, analizar y ahorrar de forma inteligente conmigo</p>
+      </div>
+    </div>
+    <div class="header-tools">
+      <select id="sel-moneda" aria-label="Seleccionar moneda" title="Moneda"></select>
+      <button id="btn-modo-oscuro" class="btn-icon-header" aria-label="Cambiar tema" title="Modo oscuro">🌙</button>
+    </div>
+  </div>
+</header>
+
+<!-- ══ NAVEGACIÓN POR TABS ════════════════════════════════════ -->
+<nav aria-label="Secciones principales">
+  <button data-tab="registro"  class="active" title="Alt+1">📝 Registro</button>
+  <button data-tab="reporte"              title="Alt+2">📋 Reporte</button>
+  <button data-tab="analisis"             title="Alt+3">📊 Análisis</button>
+  <button data-tab="plan"                 title="Alt+4">🎯 Plan de Ahorro</button>
+</nav>
+
+<main>
+
+<!-- ══ TAB: REGISTRO ══════════════════════════════════════════ -->
+<section id="tab-registro" role="tabpanel" aria-labelledby="tab-btn-registro">
+
+  <div id="banner-hoy"></div>
+
+  <div class="card">
+    <h2 id="form-titulo">Nuevo gasto</h2>
+    <form id="form-gasto" class="grid-form" autocomplete="off" novalidate>
+      <div class="field">
+        <label for="f-fecha">Fecha</label>
+        <input type="date" id="f-fecha" required aria-required="true">
+      </div>
+      <div class="field">
+        <label for="f-monto">Monto</label>
+        <input type="number" id="f-monto" min="0.01" step="0.01" placeholder="0.00" required aria-required="true">
+      </div>
+      <div class="field">
+        <label for="f-producto">Producto o servicio</label>
+        <input type="text" id="f-producto" maxlength="80" placeholder="Ej: Almuerzo, Pasaje, Café" required aria-required="true">
+      </div>
+      <div class="field">
+        <label for="f-cat">Categoría</label>
+        <select id="f-cat" aria-label="Categoría del gasto"></select>
+      </div>
+      <div class="field field-full">
+        <label for="f-notas">Notas <span class="muted">(opcional)</span></label>
+        <input type="text" id="f-notas" maxlength="200" placeholder="Ej: Cumpleaños de Ana, pago mensual...">
+      </div>
+      <div class="field field-actions">
+        <button class="btn" type="submit" id="btn-submit">➕ Agregar gasto</button>
+        <button class="btn sec hidden" type="button" id="btn-cancelar-edicion">✖ Cancelar edición</button>
+      </div>
+    </form>
+    <div id="msg-registro" aria-live="polite"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header-row">
+      <h2>Últimos registros</h2>
+      <input type="search" id="registro-busqueda" class="input-busqueda" placeholder="🔍 Buscar..." aria-label="Buscar en registros">
+    </div>
+    <div class="table-wrap" id="lista-recientes"></div>
+    <div id="paginacion-registro"></div>
+  </div>
+</section>
+
+<!-- ══ TAB: REPORTE ═══════════════════════════════════════════ -->
+<section id="tab-reporte" class="hidden" role="tabpanel" aria-labelledby="tab-btn-reporte">
+
+  <div class="card">
+    <h2>Filtrar gastos</h2>
+    <div class="filtros-rapidos">
+      <button class="btn sec btn-sm" data-filtro-rapido="hoy">Hoy</button>
+      <button class="btn sec btn-sm" data-filtro-rapido="semana">Esta semana</button>
+      <button class="btn sec btn-sm" data-filtro-rapido="mes">Este mes</button>
+      <button class="btn sec btn-sm" data-filtro-rapido="año">Este año</button>
+      <button class="btn sec btn-sm" data-filtro-rapido="todo" id="r-limpiar">Todo</button>
+    </div>
+    <div class="grid">
+      <div class="field">
+        <label for="r-desde">Desde</label>
+        <input type="date" id="r-desde">
+      </div>
+      <div class="field">
+        <label for="r-hasta">Hasta</label>
+        <input type="date" id="r-hasta">
+      </div>
+      <div class="field">
+        <label for="reporte-busqueda">Buscar</label>
+        <input type="search" id="reporte-busqueda" placeholder="🔍 Producto, categoría..." aria-label="Buscar en reporte">
+      </div>
+    </div>
+    <div class="row">
+      <button class="btn" id="r-csv">⬇️ Exportar CSV</button>
+      <button class="btn sec" id="r-json">💾 Backup JSON</button>
+      <button class="btn sec" id="r-import">📂 Importar JSON</button>
+    </div>
+  </div>
+
+  <div id="reporte-resumen-kpis"></div>
+
+  <div class="card">
+    <h2>Detalle de gastos</h2>
+    <div class="table-wrap" id="reporte-detalle"></div>
+  </div>
+
+  <div class="card">
+    <h2>Resumen por producto</h2>
+    <p class="muted">% = participación del producto en el total del período. Prom. = monto medio por compra.</p>
+    <div class="table-wrap" id="reporte-productos"></div>
+  </div>
+</section>
+
+<!-- ══ TAB: ANÁLISIS ══════════════════════════════════════════ -->
+<section id="tab-analisis" class="hidden" role="tabpanel" aria-labelledby="tab-btn-analisis">
+  <div id="analisis-out"></div>
+</section>
+
+<!-- ══ TAB: PLAN DE AHORRO ════════════════════════════════════ -->
+<section id="tab-plan" class="hidden" role="tabpanel" aria-labelledby="tab-btn-plan">
+  <div class="card">
+    <h2>🎯 Tu meta de ahorro</h2>
+    <form id="form-plan" class="grid" autocomplete="off" novalidate>
+      <div class="field">
+        <label for="p-meta">Meta de ahorro</label>
+        <input type="number" id="p-meta" min="1" step="0.01" placeholder="Ej: 5000" required>
+      </div>
+      <div class="field">
+        <label for="p-plazo">Plazo (meses)</label>
+        <input type="number" id="p-plazo" min="1" max="120" step="1" placeholder="Ej: 12" required>
+      </div>
+      <div class="field">
+        <label for="p-actual">Ahorro actual</label>
+        <input type="number" id="p-actual" min="0" step="0.01" value="0" placeholder="0.00">
+      </div>
+      <div class="field">
+        <label for="p-ingreso">Ingreso mensual <span class="muted">(opcional)</span></label>
+        <input type="number" id="p-ingreso" min="0" step="0.01" placeholder="Para calcular % de ahorro">
+      </div>
+    </form>
+    <div class="row"><button class="btn" id="p-calc">📐 Calcular plan</button></div>
+    <p class="muted" style="margin-top:12px">El plan usa tus patrones de gasto registrados. Las categorías esenciales (Servicios, Salud, Estudios, Hogar) no se recortan.</p>
+  </div>
+  <div id="plan-out"></div>
+</section>
+
+</main>
+
+<footer>
+  <p>CIX · Tus datos se guardan localmente en este dispositivo · <kbd>Alt+1-4</kbd> para navegar</p>
+</footer>
+
+<!-- Orden de carga: configuración → utilidades → datos → módulos → entrada -->
+<script src="config.js"></script>
+<script src="utils.js"></script>
+<script src="datos.js"></script>
+<script src="analisis.js"></script>
+<script src="registro.js"></script>
+<script src="reporte.js"></script>
+<script src="plan.js"></script>
+<script src="js.js"></script>
+</body>
+</html>
